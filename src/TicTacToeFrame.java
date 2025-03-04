@@ -178,12 +178,12 @@ public class TicTacToeFrame extends JFrame {
                 if (gameOver) {
                     if (currentPlayer == "X") {
                         playerXWins++;
-                        JOptionPane.showMessageDialog(boardPanel, "X wins!", "Game Over",
+                        JOptionPane.showMessageDialog(boardPanel, "X wins!", "Victory",
                                 JOptionPane.INFORMATION_MESSAGE);
                         xWinsLabel.setText("X Wins: " + playerXWins);
                     } else if (currentPlayer == "O") {
                         playerOWins++;
-                        JOptionPane.showMessageDialog(boardPanel, "O wins!", "Game Over",
+                        JOptionPane.showMessageDialog(boardPanel, "O wins!", "Victory",
                                 JOptionPane.INFORMATION_MESSAGE);
                         oWinsLabel.setText("O Wins: " + playerOWins);
                     }
@@ -317,6 +317,7 @@ public class TicTacToeFrame extends JFrame {
                     setTie(board[r][c]);
                 }
             }
+            tiesLabel.setText("Ties: " + ties);
             tieDialogue();
             return;
         }
@@ -343,7 +344,7 @@ public class TicTacToeFrame extends JFrame {
             gameOver = true;
             tie = true;
             ties++;
-            System.out.println("Tie triggered");
+            tiesLabel.setText("Ties: " + ties);
             //if there is a tie, grey all tiles
             for (int r = 0; r < ROWS; r++) {
                 for (int c = 0; c < COLS; c++) {
