@@ -138,8 +138,13 @@ public class TicTacToeFrame extends JFrame {
         }
         //if occupied, send a message about an illegal move
         else if (tile.getText() == "X" || tile.getText() == "O") {
-            messageBox.showMessageDialog(boardPanel, "Square already taken!", "Illegal Move",
-                    JOptionPane.ERROR_MESSAGE);
+            if(gameOver == true || tie == true) {
+                gameOverDialogue();
+            }
+            else {
+                messageBox.showMessageDialog(boardPanel, "Square already taken!", "Illegal Move",
+                        JOptionPane.ERROR_MESSAGE);
+            }
         }
 
     }
@@ -164,6 +169,7 @@ public class TicTacToeFrame extends JFrame {
                         oWinsLabel.setText("O Wins: " + playerOWins);
                     }
                     gameOverDialogue();
+                    return;
                 }
 
                 checkTie();
@@ -174,22 +180,28 @@ public class TicTacToeFrame extends JFrame {
     private void checkRowWin() {
         for (int r = 0; r < ROWS; r++) {
             if (board[r][0].getText() == currentPlayer && board[r][1].getText() == currentPlayer
-                    && board[r][2].getText() == currentPlayer)
+                    && board[r][2].getText() == currentPlayer) {
+
                 for (int i = 0; i < COLS; i++) {
                     setWinner(board[r][i]);
                 }
-            return;
+                gameOver = true;
+                return;
+            }
         }
     }
 
     private void checkColWin() {
         for (int c = 0; c < COLS; c++) {
             if (board[0][c].getText() == currentPlayer && board[1][c].getText() == currentPlayer
-                    && board[2][c].getText() == currentPlayer)
+                    && board[2][c].getText() == currentPlayer) {
+
                 for (int i = 0; i < ROWS; i++) {
                     setWinner(board[i][c]);
                 }
-            return;
+                gameOver = true;
+                return;
+            }
         }
     }
 
@@ -198,15 +210,14 @@ public class TicTacToeFrame extends JFrame {
                 board[2][2].getText() == currentPlayer) {
             for (int i = 0; i < 3; i++) {
                 setWinner(board[i][i]);
-                return;
             }
-        } else if (board[0][2].getText() == currentPlayer && board[1][1].getText() == currentPlayer &&
+        }
+        else if (board[0][2].getText() == currentPlayer && board[1][1].getText() == currentPlayer &&
                 board[2][0].getText() == currentPlayer) {
             setWinner(board[0][2]);
             setWinner(board[1][1]);
             setWinner(board[2][0]);
-            return;
-
+            gameOver = true;
         }
     }
 
@@ -216,9 +227,6 @@ public class TicTacToeFrame extends JFrame {
         }
         else if (currentPlayer == "O") {
             tile.setForeground(Color.red);
-            playerOWins++;
-            JOptionPane.showMessageDialog(boardPanel, "O wins!", "Game Over", JOptionPane.INFORMATION_MESSAGE);
-            oWinsLabel.setText("O Wins: " + playerOWins);
         }
         tile.setBackground(Color.gray);
         headingTextLabel.setText(currentPlayer + " is the winner!");
@@ -233,19 +241,41 @@ public class TicTacToeFrame extends JFrame {
     }
 
     private boolean vectorContainsX(JButton[] vector) {
-        if (Arrays.stream(vector).anyMatch("X"::equals))
-            return true;
-        else return false;
+        for (JButton b : vector) {
+            if (b.getText() == "X") {
+                return true;
+            }
+        }
+        return false;
     }
 
-    private static boolean vectorContainsO (JButton[] vector) {
-        if (Arrays.stream(vector).anyMatch("O"::equals))
-            return true;
-        else return false;
+    private boolean vectorContainsO (JButton[] vector) {
+        for (JButton b : vector) {
+            if (b.getText() == "O") {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void checkTie() { //brute force checks for ties by checking all possible vectors
         //will probably refactor later, copied this over from Programming 1 where I didn't know the Java syntax for arrays
+
+        if (turns >= 9) { //must be a tie if all squares are filled; here as a failsafe
+            gameOver = true;
+            tie = true;
+            ties++;
+            //if there is a tie, grey all tiles
+            for (int r = 0; r < ROWS; r++) {
+                for (int c = 0; c < COLS; c++) {
+                    setTie(board[r][c]);
+                }
+            }
+            tieDialogue();
+            return;
+        }
+
+
         JButton[] vector1 = {board[0][0], board[0][1], board[0][2]};
         JButton[] vector2 = {board[1][0], board[1][1], board[1][2]};
         JButton[] vector3 = {board[2][0], board[2][1], board[2][2]};
@@ -266,12 +296,16 @@ public class TicTacToeFrame extends JFrame {
                 && (vectorContainsX(vector8) && vectorContainsO(vector8))) {
             gameOver = true;
             tie = true;
+            ties++;
+            System.out.println("Tie triggered");
             //if there is a tie, grey all tiles
             for (int r = 0; r < ROWS; r++) {
                 for (int c = 0; c < COLS; c++) {
                     setTie(board[r][c]);
                 }
             }
+            tieDialogue();
+            return;
         }
     }
 
@@ -284,14 +318,28 @@ public class TicTacToeFrame extends JFrame {
         }
     }
 
+
+
     private void resetGame() {
         turns = 0;
         for (int r = 0; r < ROWS; r++) {
             for (int c = 0; c < COLS; c++) {
                 board[r][c].setText("");
+                board[r][c].setBackground(Color.darkGray);
+                board[r][c].setForeground(Color.white);
             }
         }
         tie = false;
         gameOver = false;
+        headingTextLabel.setText("Tic-Tac-Toe");
+    }
+
+    private void tieDialogue() {
+        int result = JOptionPane.showConfirmDialog(boardPanel, "The game ends in a tie. Play again?",
+                "Tie", JOptionPane.YES_NO_OPTION);
+
+        if (result == JOptionPane.YES_OPTION) {
+            resetGame();
+        }
     }
 }
