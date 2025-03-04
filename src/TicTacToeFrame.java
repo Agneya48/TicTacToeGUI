@@ -56,6 +56,9 @@ public class TicTacToeFrame extends JFrame {
         setVisible(true);
     }
 
+    /**
+     * Constructs ~50px tall heading area where titles and persistent messages are displayed, including turn order
+     */
     private void createHeading() {
         headingTextLabel.setBackground(Color.darkGray);
         headingTextLabel.setForeground(Color.white);
@@ -69,6 +72,9 @@ public class TicTacToeFrame extends JFrame {
         add(textPanel, BorderLayout.NORTH);
     }
 
+    /**
+     * Score panel that keeps track of Wins for both players and ties
+     */
     private void createScorePnl() {
         xWinsLabel.setBackground(Color.darkGray);
         oWinsLabel.setBackground(Color.darkGray);
@@ -99,6 +105,10 @@ public class TicTacToeFrame extends JFrame {
 
     }
 
+    /**
+     * Builds the 3x3 TicTacToe board
+     * ActionListeners on buttons trigger game logic
+     */
     private void createBoard() {
         boardPanel.setLayout(new GridLayout(ROWS, COLS));
         boardPanel.setBackground(Color.darkGray);
@@ -121,6 +131,11 @@ public class TicTacToeFrame extends JFrame {
         }
     }
 
+    /**
+     * Determines X and O placement and then checks for Wins and ties, past a certain number of moves
+     * Majority of game resolution is ultimately nested in this method
+     * @param ae ActionEvent from buttons.
+     */
     private void playerMove(ActionEvent ae) {
 
         JButton tile = (JButton) ae.getSource();
@@ -149,6 +164,10 @@ public class TicTacToeFrame extends JFrame {
 
     }
 
+    /**
+     * Checks for wins by calling methods for row, col, and diagonal wins.
+     * Ties are checked by another more complicated function
+     */
     private void checkWinOrTie() {
         if (!gameOver) {
             if (turns >= 3) {
@@ -221,6 +240,12 @@ public class TicTacToeFrame extends JFrame {
         }
     }
 
+    /**
+     * Called by the check row, col, and diagonalWin methods. Adjusts graphical display of
+     * buttons to highlight a win. This function is intended to be called multiple times
+     * within a loop, as it only paints an individual tile at a time
+     * @param tile with row and col indexes
+     */
     private void setWinner(JButton tile) {
         if (currentPlayer == "X") {
             tile.setForeground(Color.blue);
@@ -234,12 +259,23 @@ public class TicTacToeFrame extends JFrame {
 
     }
 
+    /**
+     * Highlights tiles to emphasize a tie. Intended to be called on all
+     * buttons through a nested for loop
+     * @param tile with row and col indexes
+     */
     private void setTie(JButton tile) {
         tile.setForeground(Color.orange);
         tile.setBackground(Color.gray);
         headingTextLabel.setText("Tie!");
     }
 
+
+    /**
+     * Checks whether the given list/vector of Jbuttons contains an X
+     * @param vector list of buttons that are in a line
+     * @return boolean true or false
+     */
     private boolean vectorContainsX(JButton[] vector) {
         for (JButton b : vector) {
             if (b.getText() == "X") {
@@ -249,6 +285,11 @@ public class TicTacToeFrame extends JFrame {
         return false;
     }
 
+    /**
+     * Checks whether the given list/vector of JButtons contains an O
+     * @param vector list of buttons in a line
+     * @return boolean true or false
+     */
     private boolean vectorContainsO (JButton[] vector) {
         for (JButton b : vector) {
             if (b.getText() == "O") {
@@ -258,8 +299,13 @@ public class TicTacToeFrame extends JFrame {
         return false;
     }
 
-    private void checkTie() { //brute force checks for ties by checking all possible vectors
-        //will probably refactor later, copied this over from Programming 1 where I didn't know the Java syntax for arrays
+    /**
+     * Brute force checks each vector so an earlier tie can be declared
+     * If a vector contains both an X and an O, then we know it is no longer a possible solution
+     * If all vectors contain both, then a tie is declared
+     * Will also default to declaring a tie if turn 9 is reached
+     */
+    private void checkTie() {
 
         if (turns >= 9) { //must be a tie if all squares are filled; here as a failsafe
             gameOver = true;
@@ -309,6 +355,9 @@ public class TicTacToeFrame extends JFrame {
         }
     }
 
+    /**
+     * Triggers a JOptionPane asking if the user wants to reset the board and play again
+     */
     private void gameOverDialogue() {
         int result = JOptionPane.showConfirmDialog(boardPanel,
                 "Game Over. Play again?", "Game Over", JOptionPane.YES_NO_OPTION);
@@ -319,7 +368,9 @@ public class TicTacToeFrame extends JFrame {
     }
 
 
-
+    /**
+     * Clears the board and resets to default, but keeps score
+     */
     private void resetGame() {
         turns = 0;
         for (int r = 0; r < ROWS; r++) {
@@ -334,6 +385,9 @@ public class TicTacToeFrame extends JFrame {
         headingTextLabel.setText("Tic-Tac-Toe");
     }
 
+    /**
+     * JOptionPane dialogue specifically for game overs created by a tie
+     */
     private void tieDialogue() {
         int result = JOptionPane.showConfirmDialog(boardPanel, "The game ends in a tie. Play again?",
                 "Tie", JOptionPane.YES_NO_OPTION);
